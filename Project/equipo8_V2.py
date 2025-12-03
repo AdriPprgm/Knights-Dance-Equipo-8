@@ -44,14 +44,7 @@ class JugadorCaballosBailadoresEquipo8_V2(JugadorCaballosBailadores):
         caballo_opp = cN if self.simbolo == 'B' else cB
 
         distancia_rey = self.BFS(mi_caballo, rey_opp, rens, cols)
-        distancia_caballo = self.BFS(mi_caballo, caballo_opp, rens, cols)
         distancia_defensa = self.BFS(mi_caballo, mi_rey, rens, cols)
-
-        if distancia_rey == 0:
-            return 500000
-
-        if distancia_caballo == 0:
-            return 400000
         
         opp_a_mi_rey = self.BFS(caballo_opp, mi_rey, rens, cols)
         opp_a_mi_caballo = self.BFS(caballo_opp, mi_caballo, rens, cols)
@@ -62,12 +55,8 @@ class JugadorCaballosBailadoresEquipo8_V2(JugadorCaballosBailadores):
 
         if distancia_rey > opp_a_mi_rey:
             if distancia_defensa < opp_a_mi_rey:
-                puntos += 50000
+                puntos += 15000
             else:
-                puntos -= 10000
-        
-        if distancia_rey == opp_a_mi_rey:
-            if turno == opp_simbolo:
                 puntos -= 10000
 
         opp_posibles = self.posiciones_siguientes((opp_simbolo, rens, cols, rB, rN, cB, cN))
@@ -83,28 +72,14 @@ class JugadorCaballosBailadoresEquipo8_V2(JugadorCaballosBailadores):
         if opp_mejor_pos:
             distancia_intercepcion = self.BFS(mi_caballo, opp_mejor_pos, rens, cols)
 
-            if distancia_intercepcion == 1:
+            if distancia_intercepcion == 1 and opp_a_mi_rey == 2:
                 puntos += 30000
 
-        if distancia_rey == 1 and turno == self.simbolo:
+        if distancia_rey == 1:
             if opp_a_mi_caballo > 1:
-                puntos += 50000
+                puntos += 40000
             elif opp_a_mi_caballo == 1:
-                puntos += 45000 
-            else:
-                puntos += 50000
-
-        if opp_a_mi_caballo == 1 and turno == opp_simbolo:
-            puntos -= 50000
-        
-        if distancia_caballo == 1 and turno == self.simbolo:
-            puntos += 50000
-        
-        if distancia_rey == 1 and opp_a_mi_caballo >= 2:
-            puntos += 40000
-        
-        if opp_a_mi_rey == 1 and turno == opp_simbolo:
-            puntos -= 50000
+                puntos -= 50000
 
         return puntos
 
@@ -147,7 +122,9 @@ class JugadorCaballosBailadoresEquipo8_V2(JugadorCaballosBailadores):
         for move in posibles:
             if self.triunfo(move) == self.simbolo:
                 return move
-            result: float = self.minimax(move, False, depth=5)
+            
+        for move in posibles:
+            result: float = self.minimax(move, False, depth=4)
             if result > best_score:
                 best_score = result
                 best_move = move
